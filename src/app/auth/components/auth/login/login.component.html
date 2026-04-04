@@ -1,0 +1,29 @@
+<section class="auth-page">
+    <div class="auth-card">
+        <h2>Login</h2>
+        <p class="subtitle">Sign into your account</p>
+
+        <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <input type="email" placeholder="Email Address" formControlName="email" />
+            @if(loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+                <div class="error-message">email is not valid</div>
+            }
+        </div>
+
+        <div class="form-group">
+            <input type="password" placeholder="Password" formControlName="password" />
+            @if(loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                <div class="error-message">password is not valid</div>
+            }
+        </div>
+
+        <input type="submit" value="Login" class="btn btn-primary btn-block" />
+        </form>
+
+        <p class="switch">
+        Don’t have an account?
+        <a [routerLink]="['/auth/register']">Register</a>
+        </p>
+    </div>
+</section>

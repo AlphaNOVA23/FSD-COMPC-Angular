@@ -1,0 +1,46 @@
+<section class="auth-page">
+    <div class="auth-card">
+        <h2>Sign Up</h2>
+        <p class="subtitle"><i class="fas fa-user"></i> Create Your Account</p>
+        
+        <form class="form" [formGroup]="registerForm" (ngSubmit)="registerSubmit()">
+          <div class="form-group">
+            <input type="text" placeholder="Name" formControlName="name" />
+            @if(registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+                <div class="error-message">name is required</div>
+            }
+          </div>
+          
+          <div class="form-group">
+            <input type="email" placeholder="Email Address" formControlName="email" />
+            @if(registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                <div class="error-message">email is not valid</div>
+            }
+          </div>
+      
+          <div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" formControlName="password" />
+              @if(registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+                  <div class="error-message">password is not valid</div>
+              }
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Confirm Password" formControlName="confirmPassword" />
+              @if(registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
+                  <div class="error-message">confirm password is not valid</div>
+              }
+              @if(registerForm.hasError('passwordMistMach')) {
+                  <div class="error-message">passwords do not match</div>
+              }
+            </div>
+          </div>
+      
+          <input type="submit" class="btn btn-primary btn-block" value="Register" />
+        </form>
+        
+        <p class="switch">
+            Already have an account? <a [routerLink]="['/auth/login']">Sign In</a>
+        </p>
+    </div>
+</section>
