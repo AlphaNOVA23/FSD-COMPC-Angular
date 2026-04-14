@@ -3,6 +3,12 @@
         <h2>Login</h2>
         <p class="subtitle">Sign into your account</p>
 
+        @if(errorMessage) {
+            <div class="alert alert-danger" style="color: #ff4d4f; background: rgba(255, 77, 79, 0.1); border: 1px solid #ff4d4f; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: center;">
+                {{ errorMessage }}
+            </div>
+        }
+
         <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
             <input type="email" placeholder="Email Address" formControlName="email" />

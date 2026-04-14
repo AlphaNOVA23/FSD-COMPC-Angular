@@ -1,14 +1,14 @@
 <header class="navbar">
-    <div class="container">
+    <div class="header-container">
         <div class="logo">
-        <a [routerLink]="['/']">EMS</a>
+        <a [routerLink]="isLoggedIn ? [dashboardRoute] : ['/']">EMS</a>
         </div>
 
         <nav>
         <ul class="nav-links">
-            <li><a [routerLink]="['/']">Home</a></li>
-            <li><a [routerLink]="['/auth/register']">Register</a></li>
-            <li><a [routerLink]="['/auth/login']">Login</a></li>
+            <li *ngIf="!isLoggedIn"><a [routerLink]="['/auth/register']">Register</a></li>
+            <li *ngIf="!isLoggedIn"><a [routerLink]="['/auth/login']">Login</a></li>
+            <li *ngIf="isLoggedIn"><a href="javascript:void(0)" (click)="logout()">Logout</a></li>
         </ul>
         </nav>
     </div>

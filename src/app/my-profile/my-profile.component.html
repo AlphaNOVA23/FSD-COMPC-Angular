@@ -1,0 +1,198 @@
+<div class="profile-wrapper">
+  <div class="profile-container" *ngIf="!loading && employee">
+    
+    <!-- Hero Header -->
+    <header class="profile-hero">
+      <div class="hero-main">
+        <div class="profile-avatar">
+          {{ employee.employeeName.charAt(0) }}
+        </div>
+        <div class="hero-text">
+          <h1>{{ employee.employeeName }}</h1>
+          <p class="role-caption">
+            {{ employee.positionDetails?.title || 'No Title' }} • 
+            {{ employee.department?.departmentName || 'Unassigned' }}
+          </p>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span class="stat-label">Job Level</span>
+          <span class="stat-value">{{ employee.positionDetails?.jobLevel || '—' }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Type</span>
+          <span class="stat-value">{{ employee.positionDetails?.employmentType || '—' }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Projects</span>
+          <span class="stat-value">{{ employee.responsibilities?.length || 0 }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="profile-grid">
+      
+      <!-- Left Column -->
+      <div class="grid-left">
+
+        <!-- Identity Card -->
+        <section class="glass-card">
+          <h3 class="card-title">Personal Identity</h3>
+          <div class="info-list">
+            <div class="info-item">
+              <label>Full Name</label>
+              <span>{{ employee.employeeName }}</span>
+            </div>
+            <div class="info-item">
+              <label>Employee ID</label>
+              <span>EMP-{{ employee.employeeId }}</span>
+            </div>
+            <div class="info-item" *ngIf="employee.positionDetails">
+              <label>Salary Grade</label>
+              <span>{{ employee.positionDetails.salaryGrade }}</span>
+            </div>
+            <div class="info-item" *ngIf="employee.positionDetails">
+              <label>Effective Since</label>
+              <span>{{ employee.positionDetails.effectiveDate }}</span>
+            </div>
+            <div class="info-item" *ngIf="employee.positionDetails">
+              <label>Bonus Eligible</label>
+              <span>{{ employee.positionDetails.bonusEligible ? 'Yes' : 'No' }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Team Card -->
+        <section class="glass-card">
+          <div class="card-header">
+            <h3 class="card-title">My Team</h3>
+            <span class="peer-count">{{ peers.length }} Colleagues</span>
+          </div>
+          <div class="team-avatars" *ngIf="peers.length > 0">
+            <div class="peer-avatar" *ngFor="let peer of peers.slice(0, 8)" [title]="peer.employeeName">
+              {{ peer.employeeName.charAt(0) }}
+            </div>
+            <div class="peer-more" *ngIf="peers.length > 8">+{{ peers.length - 8 }}</div>
+          </div>
+          <p class="dept-info" *ngIf="employee.department">
+            Department: <strong>{{ employee.department.departmentName }}</strong> — {{ employee.department.departmentLocation || 'No location' }}
+          </p>
+          <p class="dept-info" *ngIf="!employee.department">
+            Not assigned to any department yet.
+          </p>
+        </section>
+
+        <!-- Compensation Card -->
+        <section class="glass-card highlight">
+          <h3 class="card-title">Compensation</h3>
+          <div *ngIf="employee.salary; else noSalary">
+            <div class="info-list">
+              <div class="info-item">
+                <label>Base Salary</label>
+                <span>{{ employee.salary.baseSalary | currency }}</span>
+              </div>
+              <div class="info-item">
+                <label>Bonus</label>
+                <span>{{ employee.salary.bonus | currency }}</span>
+              </div>
+              <div class="info-item">
+                <label>Deductions</label>
+                <span>{{ employee.salary.deductions | currency }}</span>
+              </div>
+              <div class="info-item">
+                <label>Net Salary</label>
+                <span class="stat-value">{{ employee.salary.netSalary | currency }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noSalary>
+            <p class="empty-note">No compensation data available yet.</p>
+          </ng-template>
+        </section>
+      </div>
+
+      <!-- Right Column -->
+      <div class="grid-right">
+        
+        <!-- Project Assignments -->
+        <section class="glass-card">
+          <h3 class="card-title">Project Assignments</h3>
+          <div class="training-list" *ngIf="employee.responsibilities && employee.responsibilities.length > 0; else noProjects">
+            <div class="training-row" *ngFor="let r of employee.responsibilities">
+              <div class="t-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <div class="t-details">
+                <span class="t-name">{{ r.project?.projectName || 'Unnamed Project' }}</span>
+                <span class="t-meta">Role: {{ r.responsibilityType }} • Clearance: {{ r.clearanceLevel }}</span>
+                <span class="t-meta">{{ r.startDate }} → {{ r.endDate || 'Ongoing' }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noProjects>
+            <p class="empty-note">No project assignments found.</p>
+          </ng-template>
+        </section>
+
+        <!-- Training Enrollments -->
+        <section class="glass-card">
+          <h3 class="card-title">Training Enrollments</h3>
+          <div class="training-list" *ngIf="employee.trainings && employee.trainings.length > 0; else noTrainings">
+            <div class="training-row" *ngFor="let t of employee.trainings">
+              <div class="t-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z"></path>
+                </svg>
+              </div>
+              <div class="t-details">
+                <span class="t-name">{{ t.trainingProgram?.programName }}</span>
+                <span class="t-meta">Trainer: {{ t.trainingProgram?.trainer }}</span>
+              </div>
+              <span class="t-status" [class]="t.status?.toLowerCase()">{{ t.status }}</span>
+            </div>
+          </div>
+          <ng-template #noTrainings>
+            <p class="empty-note">No training enrollments found.</p>
+          </ng-template>
+        </section>
+
+        <!-- Department Head Role (if applicable) -->
+        <section class="glass-card" *ngIf="employee.departmentHeadRole">
+          <h3 class="card-title">Leadership Role</h3>
+          <div class="info-list">
+            <div class="info-item">
+              <label>Head Role</label>
+              <span>{{ employee.departmentHeadRole.headRole }}</span>
+            </div>
+            <div class="info-item">
+              <label>Term</label>
+              <span>{{ employee.departmentHeadRole.headTerm }}</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <footer class="profile-actions">
+      <button class="btn-danger" (click)="logout()">Sign Out</button>
+    </footer>
+
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="modern-spinner"></div>
+    <p>Loading Profile...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="loading-overlay">
+    <p>Failed to load your profile. Please try logging in again.</p>
+    <button class="btn-danger" (click)="logout()">Back to Login</button>
+  </div>
+</div>

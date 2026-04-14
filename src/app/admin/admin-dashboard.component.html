@@ -1,0 +1,179 @@
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Admin Panel</h2>
+      <p class="sidebar-subtitle">Manage your organization</p>
+    </div>
+    <nav class="sidebar-nav">
+      <button
+        *ngFor="let s of sections"
+        class="nav-item"
+        [class.active]="activeSection === s.key"
+        (click)="loadSection(s.key)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path [attr.d]="iconPaths[s.icon]"></path>
+        </svg>
+        <span class="nav-label">{{ s.label }}</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-header">
+      <div class="header-left">
+        <h1>{{ activeLabel }}</h1>
+        <span class="record-count" *ngIf="!loading">{{ filteredData.length }} records</span>
+      </div>
+      
+      <div class="header-actions" *ngIf="!loading">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            [placeholder]="'Search ' + (activeLabel | lowercase) + '...'"
+            class="search-input">
+        </div>
+        
+        <button class="btn-create" (click)="openCreateModal()">
+          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path [attr.d]="iconPaths['plus']"></path>
+          </svg>
+          Add Record
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading {{ activeLabel }}...</p>
+    </div>
+
+    <!-- Data Table -->
+    <div *ngIf="!loading && filteredData.length > 0" class="table-card">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th *ngFor="let key of getKeys(data[0])" 
+                  class="sortable-header"
+                  (click)="sortBy(key)">
+                {{ formatHeader(key) }}
+                <span class="sort-arrow" *ngIf="sortColumn === key">
+                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                </span>
+                <span class="sort-arrow inactive" *ngIf="sortColumn !== key">⇅</span>
+              </th>
+              <th class="actions-header">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of filteredData">
+              <td *ngFor="let key of getKeys(data[0])">
+                {{ getNestedValue(row, key) ?? '—' }}
+              </td>
+              <td class="actions-cell">
+                <!-- Specialized View Profile button for Employees -->
+                <button 
+                  *ngIf="activeSection === 'employees'"
+                  class="btn-icon btn-view" 
+                  [routerLink]="['/admin/employee', row[getIdKey(row)]]"
+                  title="View Profile">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+
+                <button class="btn-icon btn-edit" title="Edit" (click)="openEditModal(row)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path [attr.d]="iconPaths['edit']"></path>
+                  </svg>
+                </button>
+                <button class="btn-icon btn-delete" (click)="deleteRecord(row[getIdKey(row)])" title="Delete">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path [attr.d]="iconPaths['trash']"></path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && filteredData.length === 0" class="empty-state">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <p>No matches found for "{{ searchTerm }}" in {{ activeLabel | lowercase }}.</p>
+    </div>
+  </main>
+
+  <!-- Dynamic Modal Overlay -->
+  <div class="modal-backdrop" *ngIf="showModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>{{ isEditing ? 'Edit' : 'Add New' }} {{ activeLabel }}</h2>
+        <button class="btn-close" (click)="closeModal()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group" *ngFor="let key of getModalKeys()">
+            <label>{{ formatHeader(key) }}</label>
+            
+            <!-- Dropdown for configured fields -->
+            <ng-container *ngIf="isDropdownField(key)">
+              <!-- Standard select for ID-based relations (Foreign Keys) -->
+              <select 
+                *ngIf="key.toLowerCase().endsWith('id')"
+                [(ngModel)]="modalEntity[key]">
+                <option value="" disabled>Select {{ formatHeader(key) }}...</option>
+                <option *ngFor="let opt of getDropdownOptions(key)" [value]="opt.value">
+                  {{ opt.label }}
+                </option>
+              </select>
+
+              <!-- Datalist for free-text string enumerations (Roles, Status, Grades) -->
+              <div *ngIf="!key.toLowerCase().endsWith('id')" style="width: 100%;">
+                <input 
+                  [attr.list]="'datalist-' + key"
+                  [(ngModel)]="modalEntity[key]"
+                  [placeholder]="'Select or type ' + formatHeader(key) + '...'"
+                  style="width: 100%; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 8px;"
+                />
+                <datalist [id]="'datalist-' + key">
+                  <option *ngFor="let opt of getDropdownOptions(key)" [value]="opt.value">{{ opt.label }}</option>
+                </datalist>
+              </div>
+            </ng-container>
+            
+            <!-- Normal input for everything else -->
+            <input 
+              *ngIf="!isDropdownField(key)"
+              [type]="(key.toLowerCase().includes('date') || key.toLowerCase().includes('dob') || key.toLowerCase().includes('term')) ? 'date' : 'text'"
+              [(ngModel)]="modalEntity[key]" 
+              [placeholder]="'Enter ' + formatHeader(key)"
+              (keyup.enter)="saveRecord()"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+        <button class="btn-save" (click)="saveRecord()" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Save Record' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<div class="detail-layout">
+  <!-- Header -->
+  <header class="detail-header">
+    <div class="header-content">
+      <button class="btn-back" (click)="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"></path>
+        </svg>
+        Back to Dashboard
+      </button>
+      
+      <div class="employee-meta" *ngIf="employee">
+        <div class="avatar-circle">
+          {{ employee.employeeName.charAt(0) }}
+        </div>
+        <div class="meta-text">
+          <h1>{{ employee.employeeName }}</h1>
+          <p class="id-badge">EMP-ID: {{ employee.employeeId }}</p>
+        </div>
+        <button class="btn-danger-outline" (click)="deleteEmployee()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Delete Employee
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="detail-container" *ngIf="!loading && employee">
+    <!-- Tabs Navigation -->
+    <nav class="tabs-nav">
+      <button 
+        class="tab-link" 
+        [class.active]="activeTab === 'identity'" 
+        (click)="activeTab = 'identity'">
+        Identity & Profile
+      </button>
+      <button 
+        class="tab-link" 
+        [class.active]="activeTab === 'organization'" 
+        (click)="activeTab = 'organization'">
+        Organization & Role
+      </button>
+      <button 
+        class="tab-link" 
+        [class.active]="activeTab === 'payroll'" 
+        (click)="activeTab = 'payroll'">
+        Payroll & Benefits
+      </button>
+      <button 
+        class="tab-link" 
+        [class.active]="activeTab === 'performance'" 
+        (click)="activeTab = 'performance'">
+        Performance & Training
+      </button>
+    </nav>
+
+    <!-- Tab Content -->
+    <main class="tab-content-area">
+      
+      <!-- Identity Tab -->
+      <section *ngIf="activeTab === 'identity'" class="tab-panel">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" [(ngModel)]="employee.employeeName">
+          </div>
+          <div class="form-group">
+            <label>System Username</label>
+            <input type="text" [value]="employee.credential?.loginDetails?.username || 'N/A'" readonly disabled>
+          </div>
+        </div>
+        <div class="panel-actions">
+          <button class="btn-primary" (click)="updateIdentity()">Save Changes</button>
+        </div>
+      </section>
+
+      <!-- Organization Tab -->
+      <section *ngIf="activeTab === 'organization'" class="tab-panel">
+        <div class="assignment-card">
+          <h3>Department Assignment</h3>
+          <p class="description">Assign this employee to a specific business unit.</p>
+          <div class="assign-controls">
+            <select (change)="assignDepartment($event)" [value]="employee.department?.departmentId">
+              <option value="">Select Department...</option>
+              <option *ngFor="let d of departments" [value]="d.departmentId">
+                {{ d.departmentName }} ({{ d.departmentLocation }})
+              </option>
+            </select>
+            <div class="current-badge" *ngIf="employee.department">
+              Current: <strong>{{ employee.department.departmentName }}</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payroll Tab -->
+      <section *ngIf="activeTab === 'payroll'" class="tab-panel">
+        <div class="form-grid" *ngIf="employee.salary; else noSalary">
+          <div class="form-group">
+            <label>Base Salary</label>
+            <input type="number" [(ngModel)]="employee.salary.baseSalary">
+          </div>
+          <div class="form-group">
+            <label>Current Bonus</label>
+            <input type="number" [(ngModel)]="employee.salary.bonus">
+          </div>
+          <div class="form-group">
+            <label>Active Deductions</label>
+            <input type="number" [(ngModel)]="employee.salary.deductions">
+          </div>
+          <div class="form-group summary">
+            <label>Net Computed Salary</label>
+            <div class="net-value">{{ employee.salary.netSalary | currency }}</div>
+          </div>
+        </div>
+        <div class="panel-actions" *ngIf="employee.salary">
+          <button class="btn-primary" (click)="updateSalary()">Update Payroll</button>
+        </div>
+        <ng-template #noSalary>
+          <div class="empty-notif">
+            <p>No payroll record found for this employee.</p>
+            <button class="btn-primary" style="margin-top: 16px;" (click)="createPayroll()">
+              Initialize Payroll Profile
+            </button>
+          </div>
+        </ng-template>
+      </section>
+
+      <!-- Performance & Training Tab -->
+      <section *ngIf="activeTab === 'performance'" class="tab-panel">
+        <div class="training-section">
+          <h3>Training History</h3>
+          <div class="enrollment-list">
+            <div class="enroll-chip" *ngFor="let et of employee.trainings">
+              <span class="prog-name">{{ et.trainingProgram?.programName }}</span>
+              <span class="prog-status" [class]="et.status.toLowerCase()">{{ et.status }}</span>
+            </div>
+          </div>
+          
+          <div class="new-enrollment">
+            <label>Enroll in Program</label>
+            <div class="enroll-select">
+              <select #trainingSelect>
+                <option value="">Select Program...</option>
+                <option *ngFor="let t of trainings" [value]="t.trainingId">{{ t.programName }}</option>
+              </select>
+              <button class="btn-secondary" (click)="enrollInTraining(trainingSelect.value)">Enroll</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>

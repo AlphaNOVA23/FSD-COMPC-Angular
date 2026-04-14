@@ -13,25 +13,31 @@
           
           <div class="form-group">
             <input type="email" placeholder="Email Address" formControlName="email" />
-            @if(registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
-                <div class="error-message">email is not valid</div>
+            @if(registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched) {
+                <div class="error-message">Email is required</div>
+            }
+            @if(registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched) {
+                <div class="error-message">Please enter a valid email address</div>
             }
           </div>
       
           <div>
             <div class="form-group">
               <input type="password" placeholder="Password" formControlName="password" />
-              @if(registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
-                  <div class="error-message">password is not valid</div>
+              @if(registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched) {
+                  <div class="error-message">Password is required</div>
+              }
+              @if(registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched) {
+                  <div class="error-message">Password must be at least 6 characters</div>
               }
             </div>
             <div class="form-group">
               <input type="password" placeholder="Confirm Password" formControlName="confirmPassword" />
-              @if(registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
-                  <div class="error-message">confirm password is not valid</div>
+              @if(registerForm.get('confirmPassword')?.hasError('required') && registerForm.get('confirmPassword')?.touched) {
+                  <div class="error-message">Please confirm your password</div>
               }
               @if(registerForm.hasError('passwordMistMach')) {
-                  <div class="error-message">passwords do not match</div>
+                  <div class="error-message">Passwords do not match</div>
               }
             </div>
           </div>

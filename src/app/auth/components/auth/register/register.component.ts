@@ -40,7 +40,11 @@ export class RegisterComponent implements OnInit {
         next: (res) => {
           console.log('Spring Boot Response:', res);
           if (res.token) {
-            localStorage.setItem('token', res.token);
+            if (typeof window !== 'undefined' && window.localStorage) {
+              localStorage.setItem('token', res.token);
+            }
+            console.log('Token physically cached. Relocating to Dashboard.');
+            this.router.navigate(['/my-profile']);
           }
         },
         error: (err) => console.error('Register failed', err)

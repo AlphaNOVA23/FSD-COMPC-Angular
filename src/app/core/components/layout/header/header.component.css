@@ -1,44 +1,72 @@
 .navbar {
-    background-color: #1f2937;
-    padding: 15px 0;
+    background-color: #0f172a;
+    padding: 0;
     color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    z-index: 1000;
+    border-bottom: 1px solid #1e293b;
+    display: flex;
+    align-items: center;
 }
 
-.container {
-    width: 90%;
-    margin: auto;
+.header-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 28px;
+    height: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin: 0 !important; /* Force reset of any global margin */
+}
+
+.logo {
+    display: flex;
     align-items: center;
 }
 
 .logo a {
-    color: white;
-    font-size: 22px;
-    font-weight: bold;
+    color: #f8fafc;
+    font-size: 18px;
+    font-weight: 700;
     text-decoration: none;
+    letter-spacing: 0.5px;
+    line-height: 1; /* Normalize line-height for centering */
 }
 
 .nav-links {
     display: flex;
     list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 8px;
+    align-items: center; /* Ensure list items are centered */
 }
 
 .nav-links li {
-    margin-left: 20px;
+    display: flex;
+    align-items: center;
 }
 
-.nav-links a:hover {
-    color: #38bdf8;
+.nav-links li a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    line-height: 1.2; /* Better vertical balance */
+    display: flex;
+    align-items: center;
 }
 
-.signup-btn {
-    background-color: #38bdf8;
-    padding: 6px 14px;
-    border-radius: 4px;
-    color: white !important;
+.nav-links li a:hover {
+    color: #f1f5f9;
+    background: #1e293b;
 }
 
-.signup-btn:hover {
-    background-color: #0ea5e9;
-}

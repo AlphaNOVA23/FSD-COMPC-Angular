@@ -1,0 +1,42 @@
+<div class="dashboard-wrapper">
+  <div class="dashboard-container">
+    
+    <div class="header-section">
+      <h1>Departments Configuration</h1>
+      <button class="primary-btn">Create Department</button>
+    </div>
+
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Department Name</th>
+            <th>Location</th>
+            <th>Capacity Status</th>
+            <th>Manager Contact</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let dept of departments">
+            <td class="font-medium">{{ dept.departmentName }}</td>
+            <td>{{ dept.departmentLocation || 'Unassigned' }}</td>
+            <td>
+              <span class="status-badge" *ngIf="dept.departmentCapacity">{{ dept.departmentCapacity }} Employees</span>
+              <span class="status-badge empty" *ngIf="!dept.departmentCapacity">TBD</span>
+            </td>
+            <td>{{ dept.departmentContact || 'No Email Provided' }}</td>
+            <td>
+              <button class="text-btn">View</button>
+              <button class="text-btn edit">Edit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="departments.length === 0" class="empty-state">
+        <p>Your database currently contains no departments.</p>
+      </div>
+    </div>
+  </div>
+</div>

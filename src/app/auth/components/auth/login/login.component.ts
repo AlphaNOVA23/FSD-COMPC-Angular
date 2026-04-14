@@ -11,6 +11,7 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
+  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -28,18 +29,41 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      console.log('Success' + JSON.stringify(this.loginForm.value));
+      this.errorMessage = '';
       this.authService.login(this.loginForm.value).subscribe({
         next: (res) => {
-          console.log('Spring Boot Response:', res);
           if (res.token) {
             localStorage.setItem('token', res.token);
+
+            // Decode the JWT payload to extract the role
+            const role = this.extractRoleFromToken(res.token);
+            console.log('Authenticated. Role:', role);
+
+            if (role === 'ROLE_ADMIN') {
+              this.router.navigate(['/admin']);
+            } else {
+              this.router.navigate(['/my-profile']);
+            }
           }
         },
-        error: (err) => console.error('Login failed', err)
+        error: (err) => {
+          console.error('Login failed', err);
+          this.errorMessage = 'Incorrect email or password. Please try again.';
+        }
       });
-    } else {
-      console.log(this.loginForm.errors);
+    }
+  }
+
+  /** Decodes the base64 JWT payload and extracts the role claim */
+  private extractRoleFromToken(token: string): string {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      return decoded.role || 'ROLE_USER';
+    } catch (e) {
+      console.warn('Could not decode JWT, defaulting to ROLE_USER');
+      return 'ROLE_USER';
     }
   }
 }
+
