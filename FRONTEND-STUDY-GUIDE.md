@@ -62,3 +62,22 @@ One of the biggest challenges was the transition from **Standalone** components 
 - **CoreModule**: For global components like the Header and Footer.
 - **Feature Modules**: Groups related logic (like Admin or Profile) to keep the initial load time small.
 - **Shared Context**: Using `EmployeeService` as a singleton to share profile data across components.
+
+---
+
+## 📊 6. Performance Review Integration (Self-Referencing Entity)
+The `PerformanceReview` entity introduces a unique frontend challenge: the **"Previous Review"** dropdown must reference other records from the same table.
+
+### How it Works:
+1. **Reference Data**: On initialization, `loadReferenceData()` fetches all existing performance reviews into `allPerformanceReviews`.
+2. **Dropdown Population**: When the user navigates to "Perf. Reviews", `buildDropdownOptions()` creates two dropdowns:
+   - `employeeId`: Lists all employees.
+   - `previousReviewId`: Lists all existing reviews (e.g., `Review #1 (Score: 5)`).
+3. **Proxy Mapping**: In `saveRecord()`, the flat `previousReviewId` is transformed into the nested object the backend expects:
+   ```typescript
+   if (payload.previousReviewId) {
+       payload.previousReview = { reviewId: payload.previousReviewId };
+       delete payload.previousReviewId;
+   }
+   ```
+This pattern demonstrates the power of the dynamic rendering engine, since adding an entirely new entity required zero changes to the HTML template.

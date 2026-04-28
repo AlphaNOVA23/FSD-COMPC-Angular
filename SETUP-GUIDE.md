@@ -62,5 +62,5 @@ OR SIMPLY JUST DEBUG THE EmployeeManagementApplication.java FILE, SKIPPING STEPS
 
 Navigate to `http://localhost:4200` in your web browser. Since you ran the `db_schema.sql` script, you can log in immediately using the pre-seeded administrators!
 
-- **Email/Username**: `admin`
+- **Email**: `alice@company.com`
 - **Password**: `admin123`

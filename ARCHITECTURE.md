@@ -12,6 +12,7 @@ For example, an Employee entity contains nested objects:
 - `PositionDetails`
 - `Salary`
 - `Responsibilities`
+- `PerformanceReviews` (with a self-referencing link to chain previous reviews)
 
 If you attempt to assign an Employee to a Project via a `Responsibility` bridge, Spring Boot receives the nested JSON payload (`{ "employee": {"employeeId": 1}, "project": {"projectId": 2} }`), resolves the actual entities in memory, locks the database context, and fires off the relational mapping sequentially.
 

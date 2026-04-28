@@ -29,6 +29,7 @@ export class AdminDashboardComponent implements OnInit {
   allEmployees: any[] = [];
   allDepartmentHeads: any[] = [];
   allProjects: any[] = [];
+  allPerformanceReviews: any[] = [];
 
   // Dropdown configs per entity field
   dropdownOptions: { [field: string]: { value: any, label: string }[] } = {};
@@ -49,8 +50,9 @@ export class AdminDashboardComponent implements OnInit {
     { key: 'training-programs', label: 'Training Programs', icon: 'book',    endpoint: '/apix/training-programs' },
     { key: 'employee-trainings', label: 'Enrollments',   icon: 'graduate',   endpoint: '/apix/employee-trainings' },
     { key: 'training-feedbacks', label: 'Training Feedback', icon: 'message', endpoint: '/apix/training-feedbacks' },
-    { key: 'evaluations',     label: 'Evaluations',      icon: 'chart',      endpoint: '/apix/performance-evaluations' },
+    { key: 'evaluations',     label: 'Performance Evaluations', icon: 'chart',      endpoint: '/apix/performance-evaluations' },
     { key: 'perf-feedback',   label: 'Perf. Feedback',   icon: 'edit',       endpoint: '/apix/performance-feedbacks' },
+    { key: 'perf-reviews',    label: 'Perf. Reviews',    icon: 'chart',      endpoint: '/apix/performance-reviews' },
   ];
 
   iconPaths: { [key: string]: string } = {
@@ -111,6 +113,13 @@ export class AdminDashboardComponent implements OnInit {
     this.http.get<any[]>('/apix/projects').subscribe({
       next: (res) => {
         this.allProjects = res;
+        this.buildDropdownOptions(this.activeSection);
+      },
+      error: () => {}
+    });
+    this.http.get<any[]>('/apix/performance-reviews').subscribe({
+      next: (res) => {
+        this.allPerformanceReviews = res;
         this.buildDropdownOptions(this.activeSection);
       },
       error: () => {}
@@ -223,6 +232,16 @@ export class AdminDashboardComponent implements OnInit {
         { value: 'Confidential', label: 'Confidential' }
       ];
     }
+    if (sectionKey === 'perf-reviews') {
+      this.dropdownOptions['employeeId'] = this.allEmployees.map(e => ({
+        value: e.employeeId,
+        label: `${e.employeeName} (ID: ${e.employeeId})`
+      }));
+      this.dropdownOptions['previousReviewId'] = this.allPerformanceReviews.map(r => ({
+        value: r.reviewId,
+        label: `Review #${r.reviewId} (Score: ${r.scoreChange || 'N/A'})`
+      }));
+    }
   }
 
   isDropdownField(key: string): boolean {
@@ -327,6 +346,10 @@ export class AdminDashboardComponent implements OnInit {
         this.modalEntity['employeeId'] = '';
         this.modalEntity['projectId'] = '';
       }
+      if (this.activeSection === 'perf-reviews') {
+        this.modalEntity['employeeId'] = '';
+        this.modalEntity['previousReviewId'] = '';
+      }
     }
     this.showModal = true;
   }
@@ -352,6 +375,10 @@ export class AdminDashboardComponent implements OnInit {
     if (this.activeSection === 'responsibilities') {
       this.modalEntity['employeeId'] = item.employee?.employeeId || '';
       this.modalEntity['projectId'] = item.project?.projectId || '';
+    }
+    if (this.activeSection === 'perf-reviews') {
+      this.modalEntity['employeeId'] = item.employee?.employeeId || '';
+      this.modalEntity['previousReviewId'] = item.previousReview?.reviewId || '';
     }
 
     this.showModal = true;
@@ -401,6 +428,16 @@ export class AdminDashboardComponent implements OnInit {
         delete payload.projectId;
       }
     }
+    if (this.activeSection === 'perf-reviews') {
+      if (payload.employeeId !== undefined) {
+        if (payload.employeeId) payload.employee = { employeeId: payload.employeeId };
+        delete payload.employeeId;
+      }
+      if (payload.previousReviewId !== undefined) {
+        if (payload.previousReviewId) payload.previousReview = { reviewId: payload.previousReviewId };
+        delete payload.previousReviewId;
+      }
+    }
 
     if (this.isEditing) {
       const idKey = this.getIdKey(this.modalEntity);
@@ -446,6 +483,7 @@ export class AdminDashboardComponent implements OnInit {
     if ('employeeTrainingId' in item) return 'employeeTrainingId';
     if ('feedbackId' in item) return 'feedbackId';
     if ('evaluationId' in item) return 'evaluationId';
+    if ('reviewId' in item) return 'reviewId';
     return Object.keys(item)[0];
   }
 

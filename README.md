@@ -17,7 +17,7 @@
 
 The **Enterprise Employee Management System (EMS)** is an end-to-end web application built to streamline HR, project assignments, and corporate structural logic. 
 
-Designed with a stunning "vibrant dark mode" UI powered by glassmorphism, the platform dynamically maps deep relational data structures—from tracking an employee's daily timesheet and base compensation, to recursively linking department heads, managing project clearances, and monitoring continuous training enrollments.
+Designed with a stunning "vibrant dark mode" UI powered by glassmorphism, the platform dynamically maps deep relational data structures—from tracking an employee's daily timesheet and base compensation, to recursively linking department heads, managing project clearances, monitoring continuous training enrollments, and chaining performance reviews with self-referencing historical tracking.
 
 ### Key Features
 * **Role-Based Workspaces**: Distinct native experiences for standard Employees (personal profiles, team analytics) vs Administrators (global data grids).
