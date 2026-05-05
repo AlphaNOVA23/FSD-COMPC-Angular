@@ -40,3 +40,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Personal study docs
+/fsd-sem6-study-docs

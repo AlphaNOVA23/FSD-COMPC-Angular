@@ -47,6 +47,7 @@ export class AdminDashboardComponent implements OnInit {
     { key: 'leaves',          label: 'Leave Requests',   icon: 'calendar',   endpoint: '/apix/leaves' },
     { key: 'leave-types',     label: 'Leave Types',      icon: 'bookmark',   endpoint: '/apix/leave-types' },
     { key: 'tasks',           label: 'Tasks',            icon: 'check',      endpoint: '/apix/tasks' },
+    { key: 'positions',       label: 'Position Details', icon: 'briefcase',  endpoint: '/apix/positions' },
     { key: 'training-programs', label: 'Training Programs', icon: 'book',    endpoint: '/apix/training-programs' },
     { key: 'employee-trainings', label: 'Enrollments',   icon: 'graduate',   endpoint: '/apix/employee-trainings' },
     { key: 'training-feedbacks', label: 'Training Feedback', icon: 'message', endpoint: '/apix/training-feedbacks' },
@@ -208,6 +209,27 @@ export class AdminDashboardComponent implements OnInit {
         { value: 'Engineering Head', label: 'Engineering Head' }
       ];
     }
+    if (sectionKey === 'positions') {
+      this.dropdownOptions['employeeId'] = this.allEmployees.map(e => ({
+        value: e.employeeId,
+        label: `${e.employeeName} (ID: ${e.employeeId})`
+      }));
+      this.dropdownOptions['jobLevel'] = [
+        { value: 'Junior', label: 'Junior' },
+        { value: 'Mid-Level', label: 'Mid-Level' },
+        { value: 'Senior', label: 'Senior' },
+        { value: 'Executive', label: 'Executive' }
+      ];
+      this.dropdownOptions['employmentType'] = [
+        { value: 'Full-time', label: 'Full-time' },
+        { value: 'Part-time', label: 'Part-time' },
+        { value: 'Contract', label: 'Contract' }
+      ];
+      this.dropdownOptions['bonusEligible'] = [
+        { value: true, label: 'Yes' },
+        { value: false, label: 'No' }
+      ];
+    }
     if (sectionKey === 'responsibilities') {
       this.dropdownOptions['employeeId'] = this.allEmployees.map(e => ({
         value: e.employeeId,
@@ -345,6 +367,9 @@ export class AdminDashboardComponent implements OnInit {
       if (this.activeSection === 'responsibilities') {
         this.modalEntity['employeeId'] = '';
         this.modalEntity['projectId'] = '';
+      }
+      if (this.activeSection === 'positions') {
+        this.modalEntity['employeeId'] = '';
       }
       if (this.activeSection === 'perf-reviews') {
         this.modalEntity['employeeId'] = '';
